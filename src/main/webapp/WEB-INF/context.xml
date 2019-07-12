@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://camel.apache.org/schema/spring
+                           http://camel.apache.org/schema/spring/camel-spring.xsd
+">
+
+    <import resource="developer.xml"/>
+
+    <bean id="xmlProcessor" class="hello.XmlProcessor">
+        <property name="developerDAO" ref="developerDAO"/>
+    </bean>
+
+    <camelContext id="camelContext" xmlns="http://camel.apache.org/schema/spring" trace="false" streamCache="true">
+        <dataFormats>
+            <jaxb id="model" prettyPrint="true" contextPath="model"/>
+        </dataFormats>
+        <route>
+            <from uri="file://C:/_in?exclude=.*xml"/>
+            <to uri="file://C:/_out"/>
+        </route>
+        <route>
+            <from uri="file://C:/_in?include=.*xml"/>
+            <unmarshal>
+                <custom ref="model"/>
+            </unmarshal>
+            <to uri="bean:xmlProcessor?method=process"/>
+        </route>
+
+    </camelContext>
+
+</beans>
